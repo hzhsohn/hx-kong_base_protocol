@@ -1,97 +1,100 @@
 /*
-  ´ËÄ£¿éÕë¶ÔMCU¼äµÄÍ¨Ñ¶Ð­Òé
-
-//-----------------------------------------------
-Àý×Ó:
-//--½ÓÊÕÃ¿ÌõÖ¸ÁîµÄ×î´ó½ÓÊÕ»º´æ³¤¶È
-//Í¨Ñ¶ÎÞÐ£Ñé
-//×î¶Ì½á¹¹Îª4¸ö×Ö½Ú
-//uchar head;  ÒÔ0xAF¿ªÍ·
-//ushort parameter_len; ³¤¶È²»´óÓÚ65545¸ö×Ö½Ú
-//uchar* parameter; Êµ¼Ê´«ÊäÄÚÈÝ
-//uchar end;   ÒÔ0xFA½áÎ²
-  
-uchar g_cache[255]={0};
-unsigned short g_len=0;
-TzhMiniData g_ocCmd;
-uchar g_isGetCmdOk; 
-
-//Êý¾Ý½ÓÊÕ
-#pragma vector=UART1_R_RXNE_vector
-__interrupt void UART1_RX_RXNE(void)
-{
-    //µÈ´ýÖÕ¶ËÊäÈë
-    //while(!UART1_SR_RXNE); 
-    	
+ æ­¤æ¨¡å—é’ˆå¯¹MCUé—´çš„é€šè®¯åè®®
+ 
+ //-----------------------------------------------
+ ä¾‹å­:
+ //--æŽ¥æ”¶æ¯æ¡æŒ‡ä»¤çš„æœ€å¤§æŽ¥æ”¶ç¼“å­˜é•¿åº¦
+ //é€šè®¯æ— æ ¡éªŒ
+ //æœ€çŸ­ç»“æž„ä¸º4ä¸ªå­—èŠ‚
+ //uchar head;  ä»¥0xAFå¼€å¤´
+ //ushort parameter_len; é•¿åº¦ä¸å¤§äºŽ65545ä¸ªå­—èŠ‚
+ //uchar* parameter; å®žé™…ä¼ è¾“å†…å®¹
+ //uchar end;   ä»¥0xFAç»“å°¾
+ 
+ uchar g_cache[255]={0};
+ unsigned short g_len=0;
+ TzhMiniData g_ocCmd;
+ uchar g_isGetCmdOk;
+ 
+ //æ•°æ®æŽ¥æ”¶
+ #pragma vector=UART1_R_RXNE_vector
+ __interrupt void UART1_RX_RXNE(void)
+ {
+ //ç­‰å¾…ç»ˆç«¯è¾“å…¥
+ //while(!UART1_SR_RXNE);
+ 
 	if(g_len+1>254){ g_len=0; }
-    g_cache[g_len]=UART1_DR;
-    g_len++;
-    
-    if(0xFA==UART1_DR)
-    {
-        int tmp;
+ g_cache[g_len]=UART1_DR;
+ g_len++;
+ 
+ if(0xFA==UART1_DR)
+ {
+ int tmp;
  //_nnc:
-         //»ñÈ¡Ö¸Áî
-         tmp=miniDataGet(g_cache,g_len,&g_ocCmd,&g_isGetCmdOk);
-         //´¦ÀíÖ¸Áî
-         if(g_isGetCmdOk)
-         {
-            func(g_ocCmd.parameter_len,g_ocCmd.parameter);
-         }
-         //µ÷Õû»º³åÇø
-         if(tmp>0)
-         {
-           int n;
-           g_len-=tmp;
-           for(n=0;n<g_len;n++)
-           { g_cache[n]=g_cache[tmp+n]; }
-//         goto _nnc;
-         }
-    }
-}
-
-*/
+ //èŽ·å–æŒ‡ä»¤
+ tmp=miniDataGet(g_cache,g_len,&g_ocCmd,&g_isGetCmdOk);
+ //å¤„ç†æŒ‡ä»¤
+ if(g_isGetCmdOk)
+ {
+ func(g_ocCmd.parameter_len,g_ocCmd.parameter);
+ }
+ //è°ƒæ•´ç¼“å†²åŒº
+ if(tmp>0)
+ {
+ int n;
+ g_len-=tmp;
+ for(n=0;n<g_len;n++)
+ { g_cache[n]=g_cache[tmp+n]; }
+ //         goto _nnc;
+ }
+ }
+ }
+ 
+ */
 
 #ifndef _HXMCU_MINI_DATA_PROTOCOL_H__
 
 #ifdef __cplusplus
 extern "C"{
 #endif
- 
+    
 #define uchar   unsigned char
 #define ushort   unsigned short
-
+    
 #ifndef NULL
 #define NULL    0
 #endif
-
-
-//-------------------------------------------------
-
-typedef struct _TzhMiniData
-{
-  uchar head;  //0xAF¿ªÍ·
-  ushort parameter_len;
-  uchar* parameter;
-  uchar end;   //0xFA½áÎ²
-}TzhMiniData;
- 
-/*
- ¹¦ÄÜ:´´½¨Ö¸Áî  
-    ·µ»ØÖ¸ÁîµÄ³¤¶È
-*/
-int miniDataCreate(ushort parm_len,
-                  const uchar* parm,
-                  uchar* dst_buf);
-
-/*
-¹¦ÄÜ:»ñÈ¡hx-kongµÄÐ­Òé
-   ´Ó»º³åÇø½ØÈ¡Ö¸Áî,Èç¹ûµÚÒ»¸ö×Ö½Ú²»ÊÇOCÐ­ÒéµÄÍ·±êÊ¶,»á½ØÈ¡Ê§°Ü
-   ·µ»Ø½ØÈ¡³¤¶È,Èç¹ûÖ¸ÁîÎÞÐ§µÄ»°,·µ»ØµÄÊÇÎÞÓÃÊý¾ÝµÄ³¤¶È
-*/
-int miniDataGet(uchar* cache,int cache_len,TzhMiniData* pcmd,uchar* is_get_cmd_success);
-
-
+    
+    
+    //-------------------------------------------------
+    
+    typedef struct _TzhMiniData
+    {
+        uchar head;  //0xAFå¼€å¤´
+        ushort parameter_len;
+        uchar* parameter;
+        uchar end;   //0xFAç»“å°¾
+        //
+        uchar*frame_head;
+        int frame_len;
+    }TzhMiniData;
+    
+    /*
+     åŠŸèƒ½:åˆ›å»ºæŒ‡ä»¤
+     è¿”å›žæŒ‡ä»¤çš„é•¿åº¦
+     */
+    int miniDataCreate(uchar parm_len,
+                       const uchar* parm,
+                       uchar* dst_buf);
+    
+    /*
+     åŠŸèƒ½:èŽ·å–hx-kongçš„åè®®
+     ä»Žç¼“å†²åŒºæˆªå–æŒ‡ä»¤,å¦‚æžœç¬¬ä¸€ä¸ªå­—èŠ‚ä¸æ˜¯OCåè®®çš„å¤´æ ‡è¯†,ä¼šæˆªå–å¤±è´¥
+     è¿”å›žæˆªå–é•¿åº¦,å¦‚æžœæŒ‡ä»¤æ— æ•ˆçš„è¯,è¿”å›žçš„æ˜¯æ— ç”¨æ•°æ®çš„é•¿åº¦
+     */
+    int miniDataGet(uchar* cache,int cache_len,TzhMiniData* pcmd,uchar* is_get_cmd_success);
+    
+    
 #ifdef __cplusplus
 }
 #endif

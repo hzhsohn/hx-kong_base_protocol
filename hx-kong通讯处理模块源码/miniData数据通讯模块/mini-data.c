@@ -4,7 +4,7 @@
   创建一条新的指令
     返回指令的长度buf
 */
-int miniDataCreate(ushort parm_len,
+int miniDataCreate(uchar parm_len,
                   const uchar* parm,
                   uchar* dst_buf)
 {
@@ -61,6 +61,7 @@ int miniDataGet(uchar* cache,int cache_len,TzhMiniData* pcmd,uchar* is_get_cmd_s
         //判断是否协议头
         if(0xAF==cache[n])
         {
+            pcmd->frame_head=&cache[n];
             break;
         }
     }
@@ -108,6 +109,7 @@ int miniDataGet(uchar* cache,int cache_len,TzhMiniData* pcmd,uchar* is_get_cmd_s
     pcmd->end=0xFA;
     n+=1;
 
+    pcmd->frame_len=(&cache[n]) - pcmd->frame_head;
     //数据校验成功
     *is_get_cmd_success=1;
     return n;
