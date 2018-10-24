@@ -13,13 +13,15 @@ int tmp;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	nGen=hxNetCreateFrame("abc",6,(unsigned char*)"123456",true,tmpGen);
+	char a[]={0x06,0xa6,0x03,0x01,0x1b};
+	nGen=hxNetCreateFrame("J2",5,(unsigned char*)a,true,tmpGen);
 
 	//处理缓冲区获取数据帧
 	tmp=hxNetGetFrame(tmpGen,nGen,&g_ocCmd,&g_isGetCmdOk);
 	//处理指令
 	if(g_isGetCmdOk)
 	{
+		printf("get is ok\n");
 	}
 
 	return 0;
