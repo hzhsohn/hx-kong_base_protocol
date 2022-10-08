@@ -236,7 +236,12 @@ int hxNetGetFrame(uchar* cache,int cache_len,TzhNetFrame_Cmd* pcmd,uchar* is_get
 	if(0xBB==pcmd->end)
 	{
 		U16 t_checksum=0;
-		//二次校检码
+		//判断数据长度是否足够--
+		if (cache_len < (n + 2))
+		{
+			return 0;
+		}
+		//二次校检码--
 		checksum=cache[n]|cache[n+1]<<8;
 		t_checksum=hxCRC16(&cache[0] ,n);
 		if(checksum!=t_checksum)
